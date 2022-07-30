@@ -1,0 +1,1 @@
+This folder is used to help to install and configure the Rpi on the GoPiGo3
