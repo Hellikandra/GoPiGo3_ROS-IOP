@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<launch>
+  <group ns="robot_2">
+  <node name="gopigo3_2" pkg="rospigo3" type="rospigo3_node" output="screen"/>
+    
+  <!-- IOP robot integration following FKIE Guideline -->
+  <!-- JAUS configuration used by IOP bridge compoenents
+       EnableLoopback   = "2" enables you to catch the UDP messages by wireshark. -->
+  <param name="jaus_config" value="$(find jaustoolset/cfg/nm.cfg" />
+
+  <param name="name_subsystem" value="GoPiGo3_2"/>
+  <node name="iop_platform_manager" pkg="fkie_iop_component" type="iop_component">
+    <param name="name_node" value="platform manager"/>
+    <param name="iop_address" value="4.4.20"/>
+    <rosparam param="services">
+      [
+      fkie_iop_transport: "Transport",
+      fkie_iop_events: "Events",
+      <!-- fkie_iop_events: "EventsClient", -->
+      fkie_iop_accesscontrol: "AccessControl",
+      fkie_iop_discovery: "Discovery",         <!-- minimal set of services -->
+      fkie_iop_liveness: "Liveness",           <!-- minimal set of services -->
+      fkie_iop_digital_resource_discovery: "DigitalResourceDiscovery", <!-- minimal set of services -->
+      <!-- fkie_iop_digital_resource_discovery: "DigitalResourceDiscoveryClient", --> <!-- added post iop test and to be similar than fkie_iop_cfg_sim_video --> 
+      fkie_iop_digital_video: "DigitalVideo", <!-- added to be conform of fkie_iop_cfg_sim_video -->
+      fkie_iop_visual_sensor: "VisualSensor", <!-- added to be conform of fkie_iop_cfg_sim_video -->
+      fkie_iop_health_monitor: "HealthMonitor", <!-- minimal set of services -->
+      fkie_iop_global_pose_sensor: "GlobalPoseSensor",
+      fkie_iop_global_waypoint_driver: "GlobalWaypointDriver",
+      fkie_iop_platform_mode: "PlatformMode",
+      ]
+    </rosparam>
+    <rosparam subst_value="true">
+      Discovery:
+          # 2: Subsystem identification, 3: Node identification, 4: Componenet Identification
+          system_id: 2
+          # 10001: VEHICLE, 20001: OCU, 30001: OTHER_SYBSYSTEM, 40001: NODE, 50001: PAYLOAD, 60001: COMPONENT
+          system_type: 10001
+      DigitalVideo:
+          video_endpoints:
+          - "1/mpeg2ts" : "/home/piocu/catkin_ws/src/iop/iop_examples/fkie_iop_cfg_sim_video/resources/example.mp4"
+          - "2/rtsp"    : "rtsp://192.168.0.184:8554/unicast" <!-- sudo modprobe bcm2835-v4l2 && v4l2rtspserver -W 640 -H 480 -F 15 -P 8554 /dev/video0 -->
+      VisualSensor:
+          capabilities:
+          - "1":
+              - name: "local"
+          - "2":
+              - name: "RaspiCamera"
+      PlatformMode:
+          platform_mode: 1 # 0: "Standard_Operating", 1: "Training", 2: "Maintenance"
+    </rosparam>
+    <remap from="fix" to="/geographic/GroovyGPS" />
+  </node>
+</group>
+</launch>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<launch>
+  <group ns="ocu_1">
+  <param name="jaus_config" value="$(find jaustoolset)/cfg/nm.cfg"/>
+  <!--<node name="ocu_1" pkg="rosocu" type="rosocu_node" output="screen"/>-->
+  
+  <node name="rqt_ocu" pkg="rqt_gui" type="rqt_gui" args="--force-discover -p $(find rosocu)/launch/iop.perspective" />
+  
+  <node name="iop_ocu_client" pkg="fkie_iop_component" type="iop_component">
+      <param name="iop_address" value="150.64.200"/>
+      <param name="name_node" value="control_client"/>
+      <rosparam param="services">
+        [
+          fkie_iop_transport: "Transport",
+          fkie_iop_events: "EventsClient",
+          fkie_iop_discovery: "DiscoveryClient",
+          fkie_iop_client_global_pose_sensor : "GlobalPoseSensorClient",
+          fkie_iop_client_global_waypoint_driver : "GlobalWaypointDriverClient",
+        ]
+      </rosparam>
+      <rosparam subst_value="true">
+          use_queries: false
+          DiscoveryClient:
+              register_own_services: false
+              enable_ros_interface: true
+      </rosparam>
+  </node>
+  </group>
+</launch>
